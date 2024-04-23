@@ -1,0 +1,74 @@
+{% extends "base_generic.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+
+                <h5 class="card-title">{% trans "Delete Classroom" %}</h5>
+
+                <hr>
+                <p>{% trans "Classroom" %}: <code>{{ classroom }}</code></p>
+
+                {% if user.groups.all.0.name == 'professor' %}
+
+                    <p>{% trans "An exam cannot exist without a marked classroom!!!" %} </p>
+                    <p>{% trans "Before deleting, MAKE SURE you do not have any other exams associated with this class." %} </p>
+                    {% trans "Exams associated with this class" %}: <br>
+                    <script> var count = 0; </script>
+                    {% for c in classroom.discipline.classrooms2.all %}
+                        {% for e in c.exams2.all %}
+                            {% if classroom == c %}
+                                <script>
+                                    count++;
+                                    document.write(count)
+                                </script>
+                                - Exame associado a essa turma: <a href="/exam/exam/{{ e.id }}/update/" target="_blank">{{ e }}</a><br>
+                                {% if c.exams2.all.count == 1 %}
+                                    <br> {% trans "Remove this exam first or add another class to this exam" %}
+
+                                    <hr/>
+                                    <p>
+                                        {% trans "Classrooms from discipline" %}
+                                        <code>{{ classroom.discipline.discipline_name }}</code>
+                                    </p>
+                                    {% trans "Exam " %} <code>{{ e.exam_name }}</code>
+                                    {% trans "has ONLY ONE classroom: " %} <code>{{ c }}</code><br>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <hr/>
+
+                        <div class="text-left">
+                            <a href="{% url 'course:classroom-mylist' %}" class="btn btn-outline-danger">
+                                {% trans "Cancel" %}
+                            </a>
+                        </div>
+
+                        <div class="text-right">
+
+                            <script>
+                                if (count == 0) {
+                                    document.write("<button class=\"btn btn-danger\">");
+                                    document.write("{%  trans 'Delete' %}</button>")
+                                }
+                            </script>
+                        </div>
+
+                    </form>
+
+                {% endif %}
+
+                <hr>
+                {% trans "Only teacher registered in a discipline" %}<br>
+                {% trans "Contact your discipline coordinator" %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

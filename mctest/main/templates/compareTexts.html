@@ -1,0 +1,133 @@
+{% extends "base_generic.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+
+                <h5 class="card-title">{% trans "Text comparison" %}</h5>
+
+                <hr>
+
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.1.0/diff.min.js"
+                        integrity="sha512-vco9RAxEuv4PQ+iTQyuKElwoUOcsVdp+WgU6Lgo82ASpDfF7vI66LlWz+CZc2lMdn52tjjLOuHvy8BQJFp8a1A=="
+                        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+                <style>
+                    .added {
+                        background-color: #fac;
+                    }
+
+                    .erros {
+                        background-color: #fac;
+                        font-size: 22px;
+                    }
+
+                    .removed {
+                        background-color: #8f8;
+                    }
+
+                    .added-space {
+                        background-color: #eee; /* define a cor de fundo para espaços em branco */
+                    }
+
+                    .removed-space {
+                        background-color: #eff; /* define a cor de fundo para espaços em branco */
+                    }
+
+                    /* Definir o tamanho e a posição das caixas de texto */
+                    textarea {
+                        display: inline-block; /* exibir as caixas lado a lado */
+                        width: 49.5%;
+                        height: 330px; /* 10 linhas de altura */
+                    }
+
+
+                    /* Definir um estilo para a saída */
+                    #saida {
+                        white-space: pre-wrap; /* permitir quebras de linha na saída */
+                        font-family: monospace; /* usar uma fonte de largura fixa para preservar o espaçamento */
+                    }
+                </style>
+
+
+                <script>
+                    function showDifference(word1, word2) {
+                        var diff = "";
+
+                        for (var i = 0; i < word1.length; i++) {
+                            if (word1[i] === word2[i]) {
+                                diff += word1[i];
+                            } else {
+                                diff += "<span style='color: red;'>" + word1[i] + "</span>";
+                                diff += "<span style='color: green;'>" + word2[i] + "</span>";
+                            }
+                        }
+
+                        return diff;
+                    }
+
+                    function inverterTextos() {
+                        // Obter os elementos de texto de entrada
+                        var texto1 = document.getElementById("texto1").value;
+                        var texto2 = document.getElementById("texto2").value;
+
+                        // Trocar o conteúdo das caixas de texto
+                        document.getElementById("texto1").value = texto2;
+                        document.getElementById("texto2").value = texto1;
+                    }
+
+                    function compararTextos() {
+                        // Obter os elementos de texto de entrada
+                        var texto1 = document.getElementById("texto1").value;
+                        var texto2 = document.getElementById("texto2").value;
+                        var erros = 0;
+
+                        var diff = Diff.diffChars(texto1, texto2); // compara os dois textos por caracteres
+                        var output = "";
+                        diff.forEach(function (part) {
+                            var color = part.added ? "added" : part.removed ? "removed" : "";
+                            var partValue = part.value;
+                            if (partValue.trim() === "") {
+                                // se a parte atual é um espaço em branco, verifique se ele é diferente nos dois textos
+                                var index = part.index;
+                                if (texto1[index] === " " && texto2[index] !== " ") {
+                                    color += " added-space";
+                                    partValue = "&nbsp;"; // use um espaço não quebrável para que o espaço em branco seja exibido
+                                    erros++; // incrementa apenas para uma diferença real
+                                } else if (texto1[index] !== " " && texto2[index] === " ") {
+                                    color += " removed-space";
+                                    partValue = "&nbsp;";
+                                    erros++; // incrementa apenas para uma diferença real
+                                } else {
+                                    partValue = " ";
+                                }
+                            }
+                            if (color === "added" || color === "removed") {
+                                erros++; // incrementa apenas para uma diferença real
+                            }
+                            output += "<span class='" + color + "'>" + partValue + "</span>";
+                        });
+
+                        document.getElementById("erros").innerHTML = "<span class='erros'>" + erros + "</span> ";
+                        document.getElementById("saida").innerHTML = output;
+                    }
+                </script>
+
+                <p>{% trans "Enter two texts to compare, with the same number of lines:" %}</p>
+                <textarea id="texto1" style="background-color: #efe;"></textarea>
+                <textarea id="texto2" style="background-color: #fef;"></textarea>
+
+                <p>
+                    <button onclick="compararTextos()">{% trans "Text compare" %}</button>
+                    <button onclick="inverterTextos()">{% trans "Text inverter" %}</button>
+                    {% trans "Number of differences = " %}<span id="erros"></span>
+                </p>
+
+                <pre id="saida"></pre>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

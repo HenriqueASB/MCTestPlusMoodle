@@ -1,0 +1,310 @@
+{% extends "base_generic.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="card">
+                    <div class="card-body">
+
+                        <h5 class="card-title">{% trans "Question Update" %}</h5>
+
+                        {% if user.groups.all.0.name == 'professor' %}
+
+                            <!-- Create-PDF and Save-Json Buttons -->
+                            <table style="width:100%" frame="hsides" rules="cols">
+                                <tr>
+                                    <th><br>
+                                        <!-- Create-PDF -->
+                                        <form class="input-group mb-3" action="../createPDF/" method="post"
+                                              target="_blank">
+                                            {% csrf_token %}
+                                            <input class="btn btn-primary" type="submit" action=""
+                                                   value={% trans "Create-PDF" %}>
+                                        </form>
+                                        <h6>{% trans "See this question in PDF format" %}</h6>
+                                    </th>
+
+                                    <th><br>
+                                        <!-- Colab-Compile -->
+                                        <a href="https://colab.research.google.com/drive/1R7eyIorqdJMSW5XSI1NjD8jD4MEY0zRt#scrollTo=r9LuQe6AqlEd"
+                                           class="btn btn-outline-danger" target="_blank">
+                                            {% trans "Compile-Colab" %}</a>
+                                        <p>
+                                        <h6>{% trans "Copy-Paste the description of question for test in Colab Google" %}</h6>
+
+                                    </th>
+
+
+                                    <th><br>
+                                        <!-- Save-Json -->
+                                        <form class="input-group mb-3 text-right" action="../saveJson/" target="_blank"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <input class="btn btn-primary" type="submit" action=""
+                                                   value={% trans "Save-Json" %}>
+                                        </form>
+                                        <h6> {% trans "It will save all your questions to a file in json format" %}   </h6>
+                                    </th>
+                                </tr>
+                            </table>
+
+                            <hr>
+
+                            <!-- Update fields -->
+                            <form action="" method="post">
+                                {% csrf_token %}
+
+                                <!-- topic -->
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{% trans "Choose Topic" %}</span>
+                                    </div>
+                                    {% render_field form.topic class+="form-control" %}
+                                </div>
+
+                                <!-- question_short_description -->
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{% trans "Short Description" %}</span>
+                                    </div>
+                                    {% render_field form.question_short_description class+="form-control" placeholder=form.question_short_description.help_text %}
+                                </div>
+
+                                <!-- question_group -->
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{% trans "Group" %}</span>
+                                    </div>
+                                    {% render_field form.question_group class+="form-control" placeholder=form.question_group.help_text %}
+                                </div>
+
+                                <!-- question_text -->
+                                <div class="input-group mb-3">
+                                    <div class="input-group mt-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">{% trans "Description" %}</span>
+                                        </div>
+                                        {% render_field form.question_text class+="form-control" placeholder=form.question_text.help_text %}
+
+                                        <!-- comentado uso de ai_assist - incluir na versão MCTest 5.4
+                                        <div class="mb-3">
+
+                                            <div class="text-muted small mb-2">
+                                                {% render_field form.language_choice class+="form-control d-inline-block ml-2 small-font" %}
+                                            </div>
+
+                                            <div class="input-group">
+                                                <button type="button" id="ai-assist-button" class="btn btn-primary ml-2"
+                                                        data-toggle="tooltip" data-placement="top"
+                                                        title="{% trans 'Does not work for LaTeX snippets' %}">{% trans 'spell check' %}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+                                        <script>
+                                            $(document).ready(function () {
+                                                $("#ai-assist-button").click(function () {
+                                                    // Adapte a chamada Ajax para incluir o valor da linguagem selecionada
+                                                    $.ajax({
+                                                        url: "{ % url 'topic:ai_assist' %}",
+                                                        method: "POST",
+                                                        data: {
+                                                            question_text: $("#id_question_text").val(),
+                                                            language_choice: $("#id_language_choice").val(),  // Adicione este campo
+                                                        },
+                                                        success: function (data) {
+                                                            // Atualize o campo de texto da pergunta com as sugestões geradas pela IA
+                                                            $("#id_question_text").val(data.suggested_text);
+                                                        }
+                                                    });
+                                                });
+                                            });
+                                        </script>-->
+
+                                    </div>
+                                </div>
+
+
+                                <!-- question_type -->
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{% trans "Type" %}</span>
+                                    </div>
+                                    {% render_field form.question_type class+="form-control" placeholder=form.question_type.help_text %}
+                                </div>
+
+                                <!-- question_difficulty -->
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{% trans "Difficult" %}</span>
+                                    </div>
+                                    {% render_field form.question_difficulty class+="form-control" placeholder=form.question_difficulty.help_text %}
+                                </div>
+
+                                <!-- question_bloom_taxonomy -->
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{% trans "Bloom Taxonomy" %}</span>
+                                    </div>
+                                    {% render_field form.question_bloom_taxonomy class+="form-control" placeholder=form.question_bloom_taxonomy.help_text %}
+                                </div>
+
+                                <!-- question_parametric -->
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{% trans "Parametric" %}</span>
+                                    </div>
+                                    {% render_field form.question_parametric class+="form-control" placeholder=form.question_parametric.help_text %}
+                                </div>
+
+                                <!-- question_who_created -->
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{% trans "Who Created" %}</span>
+                                    </div>
+                                    {% render_field form.question_who_created class+="form-control" placeholder=form.question_who_created.help_text %}
+                                </div>
+
+                                <!-- question_last_update -->
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{% trans "Last Update" %}</span>
+                                    </div>
+                                    {% render_field form.question_last_update class+="form-control" placeholder=form.question_last_update.help_text %}
+                                </div>
+
+                                <hr>
+
+
+                                <!-- Answers -->
+                                {{ formset.management_form }}
+                                {% for f_form in formset %}
+                                    {{ f_form.as_p }}
+                                {% endfor %}
+
+
+                                <!-- Statistics -->
+                                <div class="card p-3 mb-3 shadow-sm" style="background-color: #f2f7fb;">
+                                    <h5 class="card-title">{% trans "Multiple Choice Question (QM) Statistics: Corrections, Accuracy (Correct/Correction), and IRT" %}</h5>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3 d-flex flex-column">
+                                                <label class="form-label">{% trans "Correction Count" %}</label>
+                                                {% render_field form.question_correction_count class+="form-control" placeholder=form.question_correction_count.help_text onkeyup="updateAccuracy()" %}
+                                                <div class="mt-2">
+                                                    <span id="accuracyResult" class="text-muted "></span>
+                                                    <span id="accuracyCalc" class="text-muted small"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label class="form-label">{% trans "Correct Count" %}</label>
+                                                {% render_field form.question_correct_count class+="form-control" placeholder=form.question_correction_count.help_text onkeyup="updateAccuracy()" %}
+                                            </div>
+                                        </div>
+                                        <script>
+                                            function updateAccuracy() {
+                                                const correctionCount = parseInt(document.getElementById("id_question_correction_count").value, 10);
+                                                const correctCount = parseInt(document.getElementById("id_question_correct_count").value, 10);
+                                                const accuracy = (correctCount / (correctionCount || 1)) * 100; // Avoid division by zero
+
+                                                document.getElementById("accuracyResult").textContent = `${accuracy.toFixed(2)}%`;
+                                                document.getElementById("accuracyCalc").textContent = `( = 100 * ${correctCount} / ${correctionCount || 1} )`;
+                                            }
+
+                                            updateAccuracy(); // Update on initial render as well
+                                        </script>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-12 d-flex justify-content-between align-items-center">
+                                            <span class="h5 font-weight-bold mr-3">{% trans "IRT:" %}</span>
+                                            <div class="form-group mr-3">
+                                                <label class="form-label">{% trans "Discrimination (a)" %}</label>
+                                                {% render_field form.question_IRT_a_discrimination class+="form-control" placeholder=form.question_IRT_a_discrimination.help_text %}
+                                            </div>
+                                            <div class="form-group mr-3">
+                                                <label class="form-label">{% trans "Ability (b)" %}</label>
+                                                {% render_field form.question_IRT_b_ability class+="form-control" placeholder=form.question_IRT_b_ability.help_text %}
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">{% trans "Guessing (c)" %}</label>
+                                                {% render_field form.question_IRT_c_guessing class+="form-control" placeholder=form.question_IRT_c_guessing.help_text %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- Actions buttons -->
+                                <div class="text-right">
+                                    <a href="{% url 'topic:myquestions-list' %}"
+                                       class="btn btn-outline-primary">{% trans "Back" %}</a>
+                                    <a href="{% url 'main:According' %}"
+                                       class="btn btn-outline-danger">{% trans "According" %}</a>
+                                    <input class="btn btn-primary" type="submit" value={% trans "Save" %}>
+                                    <hr>
+                                </div>
+                            </form>
+
+                            <form method="post" action="../copy/" target="_blank">
+                                <div class="text-right">
+                                    {% csrf_token %}
+                                    <input class="btn btn-outline-primary" type="submit" name="copy_question"
+                                           value="{% trans 'Duplicate This Question' %}">
+                                </div>
+                            </form>
+
+                            <!-- Actions buttons to upload images -->
+                            <form action="/topic/myquestions/importImage/" method="POST" enctype="multipart/form-data"
+                                  target="_blank">
+                                {% csrf_token %}
+                                <input type="file" name="myfile">
+                                <button class="btn btn-primary" type="submit">{% trans "Upload-Image" %}</button>
+
+                                <p>{% trans "Choose a PNG file for import." %}
+                                    {% trans "Be cautious with the file name to avoid overwriting another file with the same name." %}
+                                    {% trans "One suggestion is to include a prefix in the file name like " %}
+                                    <bf>fz_PDI_image01.png</bf>
+                                    .
+                                    {% trans "Do not include special characters and spaces in the file name." %}
+                                    {% trans "This file will be retained for 180 days in server." %}
+                                    {% trans "Remember that images in LaTeX make PDF generation extremely slow!" %}
+                                    {% trans "See below how to include this image in a question." %}
+                                </p>
+                                <pre>
+\begin{figure}[h!]\centering
+    \includegraphics[scale=0.99]{fz_PDI_image01}
+    \caption{Example figure}
+\end{figure}
+                                </pre>
+                            </form>
+
+                            <!-- Copy and Delete buttons -->
+                            <div class="text-right">
+
+                                <form action="../delete/" method="">
+                                    {% csrf_token %}
+                                    <input class="btn btn-danger" type="submit" action=""
+                                           value={% trans "Delete this Question" %}/>
+                                </form>
+                                <hr>
+                            </div>
+
+
+
+                        {% endif %}
+
+                        {% trans "Questions of the disciplines that I am enrolled" %}<br>
+                        {% trans "Contact your discipline coordinator" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base_generic.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="card">
+                    <div class="card-body">
+
+                        <h5 class="card-title">{% trans "Created a new Classroom" %}</h5>
+
+                        <hr>
+
+                        {% if user.groups.all.0.name == 'professor' %}
+
+                            <form method="post">
+                                {% csrf_token %}
+
+                                <!-- discipline -->
+                                <div class="btn-group-vertical">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{% trans "Choose Discipline" %}</span>
+                                    </div>
+                                    {% render_field form.discipline class+="form-control" %}
+                                </div>
+
+                                <!-- classroom_profs -->
+                                {% load widget_tweaks %}
+                                <div class="btn-group-vertical">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{% trans "Choose Profs" %}</span>
+                                    </div>
+                                    {% render_field form.classroom_profs class+="form-control" value='{{ user.email }}' %}
+                                    <p>{% trans "If you are not the course coordinator, to include students you must choose at least one teacher from the class" %}<br>
+                                        {% trans "The teacher who creates a class and does NOT mark the email above will NOT be able to add students to the class" %}<br>
+                                        {% trans "Search with CTRL+F" %}
+                                        - {% trans "Hold CTRL to mark more than one teacher" %} </p>
+                                </div>
+
+                                <p></p>
+
+                                <!-- classroom_code -->
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{% trans "Code" %}</span>
+                                    </div>
+                                    {% render_field form.classroom_code class+="form-control" placeholder=form.classroom_code.label %}
+                                </div>
+
+                                <!-- classroom_room -->
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{% trans "Room" %}</span>
+                                    </div>
+                                    {% render_field form.classroom_room class+="form-control" placeholder=form.classroom_room.label %}
+                                </div>
+
+                                <!-- Creation Period -->
+                                {% block body %}
+
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">{% trans "Period" %} ({% trans "Format" %}: <span
+                                                    id="anoQuadrimestreSpan"></span>)</span>
+                                        </div>
+                                        {% render_field form.classroom_days class+="form-control" value='XXX' id="classroomDaysField" %}
+                                    </div>
+
+                                    <script>
+                                        // Obter a data atual
+                                        var dataAtual = new Date();
+
+                                        // Obter o ano e o quadrimestre
+                                        var ano = dataAtual.getFullYear();
+                                        var quadrimestre = Math.floor((dataAtual.getMonth() + 4) / 4);
+
+                                        // Criar a variável desejada
+                                        var variavelAnoQuadrimestre = ano + '.' + quadrimestre;
+
+                                        // Atualizar o conteúdo da span e o valor do campo de formulário
+                                        document.getElementById('anoQuadrimestreSpan').innerText = variavelAnoQuadrimestre;
+                                        document.getElementById('classroomDaysField').value = variavelAnoQuadrimestre;
+                                    </script>
+
+                                {% endblock %}
+
+                                <!-- classroom_type -->
+                                <div class="btn-group-vertical">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">{% trans "Type" %}</span>
+                                    </div>
+                                    {% render_field form.classroom_type class+="form-control" %}
+                                </div>
+
+                                <hr>
+                                <div class="text-right">
+                                    <a href="{% url 'course:classroom-mylist' %}"
+                                       class="btn btn-outline-primary">{% trans "Back" %}</a>
+                                    <button class="btn btn-primary">{% trans "Save" %}</button>
+                                </div>
+                            </form>
+
+                        {% endif %}
+
+                        <hr>
+                        {% trans "Import students by csv file in My Classrooms" %}<br>
+                        {% trans "Only teacher registered in a discipline" %}<br>
+                        {% trans "Contact your discipline coordinator" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

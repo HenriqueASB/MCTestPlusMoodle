@@ -1,0 +1,56 @@
+{% extends "base_generic.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+{% block content %}
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+
+                <h5 class="card-title">{% trans "Delete Question" %}</h5>
+
+                <hr>
+
+                {% if user.groups.all.0.name == 'professor' %}
+
+                    <p class="card-text">
+                        {% trans "Are you sure you want to delete the question" %}: <code>{{ question }}</code>?
+                    </p>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <hr/>
+                        <div class="text-left">
+                            <a href="{% url 'topic:myquestions-list' %}" class="btn btn-outline-danger">
+                                {% trans "Cancel" %}
+                            </a>
+                        </div>
+                        {% for d in question.topic.discipline.all|slice:":1" %}
+
+                            {% if user.is_superuser or user in d.discipline_coords.all or user == question.question_who_created %}
+                                <div class="text-right">
+                                    <a href="{% url 'main:According' %}" class="btn btn-outline-danger">
+                                        {% trans "According" %}</a>
+                                    <button class="btn btn-danger">{% trans "Delete" %}</button>
+                                </div>
+
+                            {% else %}
+                                <div class="text-left">
+                                    <p></p>
+                                    <code>
+                                        {% trans "ERROR: You did not create this question or you are not the course coordinator. Please get in touch with them." %}
+                                    </code>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                    </form>
+
+                {% endif %}
+
+                <hr>
+                {% trans "Questions of the disciplines that I am enrolled" %}
+                {% trans "Contact your discipline coordinator" %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

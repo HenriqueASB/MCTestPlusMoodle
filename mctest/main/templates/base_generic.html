@@ -1,0 +1,709 @@
+{# base_generic.html it's the skeleton model #}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    {% load i18n %}
+    <!-- Add additional CSS in static file -->
+    {% load static %}
+
+    <meta charset="utf-8">
+
+    <!-- Title -->
+    {% block title %}<title>MCTest</title>{% endblock %}
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{% static 'icon.png' %}" type="image/x-icon">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+
+    {% block styles %}{% endblock %}
+
+    <style>
+        .carousel-caption {
+            position: relative;
+            left: 0;
+            top: 0;
+        }
+
+        .mt-5 {
+            max-width: 90%;
+        }
+
+    </style>
+</head>
+<!-- vision:  rgba(255,200,200,0.25) -->
+<!-- mctest:  rgba(172,206,220,0.48) -->
+<!-- nubisys: rgba(100,200,100,0.25) -->
+<body style="background-color: rgba(172,206,220,0.48);">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'main:index' %}">
+        <img src="{% static 'webMCTest.png' %}" height="45px">
+    </a>
+    <button class="navbar-toggler" type="button"
+            data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+        <ul class="navbar-nav mr-auto">
+
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'course:institute-list' %}">{% trans "All institutes" %}</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'course:course-list' %}">{% trans "All courses" %}</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'course:discipline-list' %}">{% trans "All disciplines" %}</a>
+            </li>
+
+            {% if user.is_authenticated and user.groups.all.0.name == 'professor' %}
+                {% if user.groups.all.0.name == 'professor' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/course/classrooms/">{% trans "Classrooms" %}</a>
+                    </li>
+                {% endif %}
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/topic/topics">{% trans "All topics" %}</a>
+                </li>
+
+                {% if user.groups.all.0.name == 'professor' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/topic/questions">{% trans "All questions" %}</a>
+                    </li>
+                {% endif %}
+
+                {% if user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/exam/exams/">{% trans "All exams" %}</a>
+                    </li>
+                    <p>
+                {% endif %}
+            {% endif %}
+
+        </ul>
+        {% if user.is_authenticated %}
+            <ul class="navbar-nav mr-auto">
+                <script>
+                    if (localStorage.getItem("count_timer")) {
+                        //localStorage.clear("count_timer");
+                        var count_timer = localStorage.getItem("count_timer");
+                    } else {
+                        var count_timer = 10;//2*3600; // 2 horas
+                    }
+                    var hors = parseInt(count_timer / 3600);
+                    var minutes = parseInt((count_timer % 3600) / 60);
+                    var seconds = parseInt(count_timer % 60);
+
+                    function countDownTimer() {
+                        if (hors < 10) {
+                            hors = "0" + hors;
+                        }
+                        if (seconds < 10) {
+                            seconds = "0" + seconds;
+                        }
+                        if (minutes < 10) {
+                            minutes = "0" + minutes;
+                        }
+
+                        document.getElementById("total-time-left").innerHTML = "[" + hors + ":" + minutes + ":" + seconds + "]";
+                        if (count_timer <= 0) {
+                            localStorage.clear("count_timer");
+                            document.location.reload(true);
+                        } else {
+                            count_timer = count_timer - 1;
+                            hors = parseInt(count_timer / 3600);
+                            minutes = parseInt((count_timer % 3600) / 60);
+                            seconds = parseInt(count_timer % 60);
+                            localStorage.setItem("count_timer", count_timer);
+                            setTimeout("countDownTimer()", 1000);
+                        }
+                    }
+
+                    setTimeout("countDownTimer()", 1000);
+                </script>
+                <!--
+                <div class="nav-link" id="total-time-left" align="center"></div>
+                -->
+            </ul>
+        {% endif %}
+
+        <ul class="navbar-nav float-right">
+            {% if user.is_authenticated %}
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">{{ user.username }}:</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/topic/myquestions/">{% trans "Questions" %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/course/classroomsmy/">{% trans "Classrooms" %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/exam/myexams/">{% trans "Exams" %}</a>
+                </li>
+                <p>
+                    {% if user.is_staff %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">{% trans "Admin" %}</a>
+                        </li>
+                    {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">{% trans "Logout" %}</a>
+                </li>
+
+            {% else %}
+                <li><a class="nav-link" href="{% url 'login' %}?next={{ request.path }}">{% trans "Login" %}</a></li>
+            {% endif %}
+
+            <li class="nav-item">
+                <a class="nav-link" href="/signup">{% trans "Sign up" %}</a>
+            </li>
+
+        </ul>
+
+    </div>
+</nav>
+
+<!-- Contend of site -->
+{% block content %}{% endblock %}
+
+
+{% block scripts %}{% endblock %}
+
+<!-- For scrolls in tables -->
+<link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/buttons/1.6.0/css/buttons.bootstrap4.min.css" rel="stylesheet">
+
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.0/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.bootstrap4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.colVis.min.js"></script>
+
+<hr>
+
+<!-- table example -->
+<script>
+    $(document).ready(function () {
+        var table = $('#example').DataTable({
+            dom: "Bfrtip",
+            scrollY: "550px",
+            scrollX: true,
+            paging: false,
+            //bInfo: false,
+            buttons: [
+                {
+                    extend: 'copy',
+                    text: '{% trans 'copy' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'csv',
+                    text: '{% trans 'csv' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'excel',
+                    text: '{% trans 'excel' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    text: '{% trans 'pdf' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '{% trans 'print' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+
+                {
+                    extend: 'colvis',
+                    text: '{% trans 'column visibility' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+            ]
+        });
+
+        table.buttons().container()
+            .appendTo('#example_wrapper .col-md-6:eq(0)');
+    });
+
+</script>
+
+<!-- table example0 - show classrooms in disciplines detail -->
+<script>
+    $(document).ready(function () {
+        var table = $('#example0').DataTable({
+            dom: "Bfrtip",
+            scrollY: "550px",
+            scrollX: true,
+            paging: false,
+            //bInfo: false,
+            buttons: [
+                {
+                    extend: 'copy',
+                    text: '{% trans 'copy' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'csv',
+                    text: '{% trans 'csv' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'excel',
+                    text: '{% trans 'excel' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    text: '{% trans 'pdf' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '{% trans 'print' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                //{
+                //    extend: 'colvis',
+                //    text: '{% trans 'column visibility' %}',
+                //    exportOptions: {
+                //        columns: ':visible'
+                //    }
+                //},
+            ]
+        });
+
+        table.buttons().container()
+            .appendTo('#example_wrapper .col-md-6:eq(0)');
+
+    });
+</script>
+
+<!-- table example1 - show exam update -->
+<script>
+    $('body').on('change', '#mass_select_all', function () {
+        var rows, checked;
+        rows = $('#example1').find('tbody tr');
+        checked = $(this).prop('checked');
+        $.each(rows, function () {
+            var checkbox = $($(this).find('td').eq(0)).find('input').prop('checked', checked);
+        });
+    });
+    /* Create an array with the values of all the checkboxes in a column */
+    $.fn.dataTable.ext.order['dom-checkbox'] = function (settings, col) {
+        return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
+            return $('input', td).prop('checked') ? '0' : '1';
+        });
+    }
+    $(document).ready(function () {
+        var table = $('#example1').DataTable({
+            "columnDefs": [{
+                "targets": [0],
+                "orderDataType": 'dom-checkbox',
+            }],
+            dom: "Bfrtip",
+            scrollY: "550px",
+            scrollX: true,
+            paging: false,
+            bInfo: true,
+            buttons: [
+                {
+                    extend: 'copy',
+                    text: '{% trans 'copy' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'csv',
+                    text: '{% trans 'csv' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'excel',
+                    text: '{% trans 'excel' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    text: '{% trans 'pdf' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '{% trans 'print' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+
+                {
+                    extend: 'colvis',
+                    text: '{% trans 'column visibility' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+            ]
+        });
+
+        table.buttons().container()
+            .appendTo('#example_wrapper .col-md-6:eq(0)');
+
+        $(':checkbox').on('change', function (e) {
+            var row = $(this).closest('tr');
+            var hmc = row.find(':checkbox:checked').length;
+            var kluj = parseInt(hmc);
+            row.find('td.counter').text(kluj);
+            table.row(row).invalidate('dom');
+        });
+    });
+</script>
+
+<!-- table example3 - show classrooms in update exam -->
+<script>
+    $('body').on('change', '#mass_select_all_Class', function () {
+        var rows, checked;
+        rows = $('#example3').find('tbody tr');
+        checked = $(this).prop('checked');
+        $.each(rows, function () {
+            var checkbox = $($(this).find('td').eq(0)).find('input').prop('checked', checked);
+        });
+    });
+    /* Create an array with the values of all the checkboxes in a column */
+    $.fn.dataTable.ext.order['dom-checkbox'] = function (settings, col) {
+        return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
+            return $('input', td).prop('checked') ? '0' : '1';
+        });
+    }
+    $(document).ready(function () {
+        var table = $('#example3').DataTable({
+            "columnDefs": [{
+                "targets": [0],
+                "orderDataType": 'dom-checkbox',
+            }],
+            dom: "Bfrtip",
+            scrollY: "550px",
+            scrollX: true,
+            paging: false,
+            bInfo: true,
+            buttons: [
+                {
+                    extend: 'copy',
+                    text: '{% trans 'copy' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'csv',
+                    text: '{% trans 'csv' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'excel',
+                    text: '{% trans 'excel' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    text: '{% trans 'pdf' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '{% trans 'print' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+
+                {
+                    extend: 'colvis',
+                    text: '{% trans 'column visibility' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+            ]
+        });
+
+        table.buttons().container()
+            .appendTo('#example_wrapper .col-md-6:eq(0)');
+
+        $(':checkbox').on('change', function (e) {
+            var row = $(this).closest('tr');
+            var hmc = row.find(':checkbox:checked').length;
+            var kluj = parseInt(hmc);
+            row.find('td.counter').text(kluj);
+            table.row(row).invalidate('dom');
+        });
+    });
+</script>
+
+
+<!-- table example6 - show topics in update exam  NÃO CONSEGUI INCLUIR EM UM BD JÁ EXISTENTE -->
+<script>
+    $('body').on('change', '#mass_select_all_Topic', function () {
+        var rows, checked;
+        rows = $('#example6').find('tbody tr');
+        checked = $(this).prop('checked');
+        $.each(rows, function () {
+            var checkbox = $($(this).find('td').eq(0)).find('input').prop('checked', checked);
+        });
+    });
+    /* Create an array with the values of all the checkboxes in a column */
+    $.fn.dataTable.ext.order['dom-checkbox'] = function (settings, col) {
+        return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
+            return $('input', td).prop('checked') ? '0' : '1';
+        });
+    }
+    $(document).ready(function () {
+        var table = $('#example6').DataTable({
+            "columnDefs": [{
+                "targets": [0],
+                "orderDataType": 'dom-checkbox',
+            }],
+            dom: "Bfrtip",
+            scrollY: "550px",
+            scrollX: true,
+            paging: false,
+            bInfo: true,
+            buttons: [
+                {
+                    extend: 'copy',
+                    text: '{% trans 'copy' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'csv',
+                    text: '{% trans 'csv' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'excel',
+                    text: '{% trans 'excel' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    text: '{% trans 'pdf' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '{% trans 'print' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+
+                {
+                    extend: 'colvis',
+                    text: '{% trans 'column visibility' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+            ]
+        });
+
+        table.buttons().container()
+            .appendTo('#example_wrapper .col-md-6:eq(0)');
+
+        $(':checkbox').on('change', function (e) {
+            var row = $(this).closest('tr');
+            var hmc = row.find(':checkbox:checked').length;
+            var kluj = parseInt(hmc);
+            row.find('td.counter').text(kluj);
+            table.row(row).invalidate('dom');
+        });
+    });
+</script>
+
+
+<!-- table example4 - show classrooms in create exam -->
+<script>
+    $('body').on('change', '#mass_select_all', function () {
+        var rows, checked;
+        rows = $('#example4').find('tbody tr');
+        checked = $(this).prop('checked');
+        $.each(rows, function () {
+            var checkbox = $($(this).find('td').eq(0)).find('input').prop('checked', checked);
+        });
+    });
+    /* Create an array with the values of all the checkboxes in a column */
+    $.fn.dataTable.ext.order['dom-checkbox'] = function (settings, col) {
+        return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
+            return $('input', td).prop('checked') ? '0' : '1';
+        });
+    }
+    $(document).ready(function () {
+        var table = $('#example4').DataTable({
+            "columnDefs": [{
+                "targets": [0],
+                "orderDataType": 'dom-checkbox',
+            },
+                {
+                    "targets": [2, 3, 4, 5, 6, 7],
+                    "orderable": false
+                },
+            ],
+            order: [[1, "asc"]],
+            lengthChange: false,
+            dom: "Bfrtip",
+            scrollY: "550px",
+            scrollX: true,
+            paging: false,
+            buttons: [
+                {
+                    extend: 'copy',
+                    text: '{% trans 'copy' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'csv',
+                    text: '{% trans 'csv' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'excel',
+                    text: '{% trans 'excel' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    text: '{% trans 'pdf' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '{% trans 'print' %}',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                //{
+                //    extend: 'colvis',
+                //    text: '{% trans 'column visibility' %}',
+                //    exportOptions: {
+                //        columns: ':visible'
+                //    }
+                //},
+            ]
+        });
+
+        table.buttons().container()
+            .appendTo('#example_wrapper .col-md-6:eq(0)');
+    });
+</script>
+
+<style>
+    table.dataTable {
+        border-collapse: collapse !important;
+    }
+</style>
+
+
+<ul>
+    <font size="2" color="black">
+        <a href="https://www.gnu.org/licenses/agpl-3.0.html"><img
+                src="{% static 'agplv3.png' %}"></a>
+        <a href="{% url 'main:license' %}">Copyright © 2018-2024</a> {% trans "by" %}
+        <a href="https://sites.google.com/site/fzampirolli/">Francisco de Assis Zampirolli</a>
+        {% trans "from" %} <a
+            href="http://www.ufabc.edu.br">UFABC</a> {% trans "and" %}
+        <a href="{% url 'main:contributors' %}">{% trans "individual contributors" %}</a>;
+        <a href="{% url 'main:users' %}">{% trans "Who use" %}</a>;
+        <a href="http://github.com/fzampirolli/mctest">{% trans "Download" %}</a>;
+        <a href="https://github.com/fzampirolli/mctest/tree/master/book/"> {% trans "Book" %};
+            <a href="{% url 'main:readme' %}"> {% trans "README" %}.</a><br>
+            {% trans "Grant" %}: <a href="http://www.ufabc.edu.br">UFABC</a>;
+            <a href="https://bv.fapesp.br/pt/auxilios/28430/modelagem-de-objetos-usando-morfologia-matematica-e-grafos-de-vizinhanca/">
+                #2009/14430–1</a> {% trans "and" %}
+            <a href="https://bv.fapesp.br/pt/auxilios/105047/um-sistema-universal-para-geracao-e-correcao-automatica-de-questoes-parametrizadas/">
+                #2018/23561-1</a> - <a href="http://fapesp.br">FAPESP</a>
+
+    </font>
+</ul>
+
+</body>
+
+</html>

@@ -1,0 +1,47 @@
+{% extends "base_generic.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="card">
+                    <div class="card-body">
+
+                        <h5 class="card-title">{% trans "Sign up" %}</h5>
+
+                        <hr>
+                        <h2>{% trans "Sign up" %}</h2>
+                        <p>{% trans "Only teachers can register for this service." %}<br>
+                            {% trans "It is necessary to use the institutional email, as stated in the institution's registration." %}<br>
+                        {% trans "For example, user@ufabc.edu.br is valid, while user@aluno.ufabc.edu.br is invalid." %}</p>
+                        <form method="post">
+                            {% csrf_token %}
+                            {% for field in form %}
+                                <p>
+                                    <div class="group_{{ field.auto_id }}">
+                                        {{ field.label_tag }}<br>
+                                        {{ field }}
+                                        {% if field.help_text %}
+                                            <small style="color: grey">{{ field.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in field.errors %}
+                                            <p style="color: #ff0000">{{ error }}</p>
+                                        {% endfor %}
+                                </div>
+                                </p>
+                            {% endfor %}
+                        <div class="text-right">
+                            <a href="{% url 'main:According' %}" class="btn btn-outline-danger">
+                                {% trans "According" %}</a>
+                            <button type="submit" class="btn btn-primary">{% trans "Sign up" %}</button>
+                        </div>
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
